@@ -145,17 +145,17 @@ test('the unary set can be overridden for a custom engine', () => {
 test('the [*] projection sugar compiles to a map', () => {
   // `items[*].total` projects `total` over every element via json-logic's map.
   assert.deepEqual(compile('=items[*].total'),
-    { map: [{ val: 'items' }, { val: 'total' }] })
+    { merge: { map: [{ val: 'items' }, { val: 'total' }] } })
   assert.deepEqual(compile('=SUM(items[*].total)'),
-    { SUM: [{ map: [{ val: 'items' }, { val: 'total' }] }] })
+    { SUM: [{ merge: { map: [{ val: 'items' }, { val: 'total' }] } }] })
   // A deeper projection path stays a path inside the mapper.
   assert.deepEqual(compile('=orders[*].customer.city'),
-    { map: [{ val: 'orders' }, { val: ['customer', 'city'] }] })
+    { merge: { map: [{ val: 'orders' }, { val: ['customer', 'city'] }] } })
   // `items[*]` with nothing after is just the array.
-  assert.deepEqual(compile('=items[*]'), { val: 'items' })
+  assert.deepEqual(compile('=items[*]'), { merge: { val: 'items' } })
 })
 
 test('nested [*] projections nest maps', () => {
   assert.deepEqual(compile('=rows[*].cells[*].v'),
-    { map: [{ val: 'rows' }, { map: [{ val: 'cells' }, { val: 'v' }] }] })
+    { merge: { map: [{ val: 'rows' }, { merge: { map: [{ val: 'cells' }, { val: 'v' }] } }] } })
 })

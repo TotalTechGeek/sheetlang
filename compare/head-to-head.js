@@ -1,5 +1,5 @@
 /**
- * formulas vs HyperFormula.
+ * sheetlang vs HyperFormula.
  *
  * Kept in its own package: HyperFormula is GPL-3.0-only, and that licence must not
  * reach the parent project through a shared node_modules.
@@ -28,7 +28,7 @@ function report (title, note, ours, theirs) {
   console.log(`  ${ours.label.padEnd(width)}  ${format(ours.perOp).padStart(10)}`)
   console.log(`  ${theirs.label.padEnd(width)}  ${format(theirs.perOp).padStart(10)}`)
   const ratio = theirs.perOp / ours.perOp
-  const winner = ratio > 1 ? 'formulas' : 'HyperFormula'
+  const winner = ratio > 1 ? 'sheetlang' : 'HyperFormula'
   console.log(`  \x1b[1m-> ${winner} faster by ${(ratio > 1 ? ratio : 1 / ratio).toFixed(1)}x\x1b[0m`)
 }
 
@@ -45,7 +45,7 @@ console.log('HyperFormula', HyperFormula.version, '| functions:',
 
   const priced = build('=ROUND(qty * price * (1 - discount), 2)')
   let i = 0
-  const ours = bench('formulas: build() once, run per row', 2e5, () => priced(rows[i++ % 1000]))
+  const ours = bench('sheetlang: build() once, run per row', 2e5, () => priced(rows[i++ % 1000]))
 
   // HyperFormula has no variables, so the row must be written into cells and the
   // result read back. This is the honest cost of using it for this job.
@@ -66,7 +66,7 @@ console.log('HyperFormula', HyperFormula.version, '| functions:',
 // 2. One-off evaluation of a formula string
 // ---------------------------------------------------------------------------
 {
-  const ours = bench('formulas: evaluate()', 2e4, () =>
+  const ours = bench('sheetlang: evaluate()', 2e4, () =>
     evaluate('=ROUND(qty * price * (1 - discount), 2)', { qty: 3, price: 19.99, discount: 0.1 }))
 
   const hf = HyperFormula.buildFromArray([[3, 19.99, 0.1]], HF_CONFIG)
@@ -80,7 +80,7 @@ console.log('HyperFormula', HyperFormula.version, '| functions:',
 // 3. Parse/compile only
 // ---------------------------------------------------------------------------
 {
-  const ours = bench('formulas: compile()', 2e4, () =>
+  const ours = bench('sheetlang: compile()', 2e4, () =>
     compile('=IF(AND(A1>1,B1<2), ROUND(SUM(A1:A10)*C1, 2), IFERROR(VLOOKUP(D1, B1:D9, 3, FALSE), "n/a"))'))
 
   const hf = HyperFormula.buildFromArray([[1, 2, 3, 4]], HF_CONFIG)
@@ -106,7 +106,7 @@ console.log('HyperFormula', HyperFormula.version, '| functions:',
   }
 
   const sum = build('=SUM(A1:E200)')
-  const ours = bench('formulas: SUM(A1:E200)', 2e4, () => sum(cells))
+  const ours = bench('sheetlang: SUM(A1:E200)', 2e4, () => sum(cells))
 
   const hfGrid = grid.map((line) => [...line])
   hfGrid[0][5] = '=SUM(A1:E200)'
@@ -137,7 +137,7 @@ for (const size of [1000, 10000]) {
   const names = Object.keys(cells)
   for (const name of names) sheet.get(name)
   let r = 0
-  const ours = bench('formulas: Sheet', 200, () => {
+  const ours = bench('sheetlang: Sheet', 200, () => {
     sheet.set('A1', ++r)
     let total = 0
     for (const name of names) { const v = sheet.get(name); if (typeof v === 'number') total += v }
@@ -171,7 +171,7 @@ for (const size of [1000, 10000]) {
   }
   cells.B1 = '=A1+1'
 
-  const ours = bench('formulas: new Sheet()', 30, () => new Sheet(cells))
+  const ours = bench('sheetlang: new Sheet()', 30, () => new Sheet(cells))
   const theirs = bench('HyperFormula: buildFromArray()', 30, () => HyperFormula.buildFromArray(grid, HF_CONFIG))
 
   report(`6. Building a ${size.toLocaleString()}-formula sheet`, 'Ours compiles only; HyperFormula also evaluates eagerly.', ours, theirs)
@@ -188,7 +188,7 @@ console.log('\n\x1b[1m7. Arbitrary data shapes\x1b[0m')
     taxRate: 0.23
   }
   const formula = '=customer.address.city & ": " & TEXT((orders[0].total + orders[1].total) * (1 + taxRate), "#,##0.00")'
-  console.log('  formulas:    ', JSON.stringify(evaluate(formula, data)))
+  console.log('  sheetlang:    ', JSON.stringify(evaluate(formula, data)))
   console.log('  HyperFormula: no equivalent — the data model is a grid of cells')
   console.log('\n  compiled AST is plain data:')
   console.log('   ', JSON.stringify(compile('=SUM(A1:A3) * taxRate')))

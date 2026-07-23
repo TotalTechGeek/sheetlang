@@ -316,6 +316,8 @@ test('the [*] projection sugar maps a field over a collection', () => {
   assert.equal(evaluate('=SUM(items[*].total)', data), 35)
   assert.equal(evaluate('=MAX(items[*].qty)', data), 9)
   assert.equal(evaluate('=COUNT(items[*].total)', data), 3)
+  assert.equal(evaluate('=SUM(hours[*][*])', { hours: [[1,2,3], [4,5]] }), 15)
+
   // Composes: taxRate stays at top-level scope, outside the projection.
   assert.equal(evaluate('=SUM(items[*].total) * (1 + taxRate)', data), 38.5)
 })

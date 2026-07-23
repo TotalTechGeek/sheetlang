@@ -48,7 +48,7 @@
     if (i === -1) return val(path)
     const source = val(path.slice(0, i))
     const rest = path.slice(i + 1)
-    return rest.length ? { map: [source, reference(rest)] } : source
+    return rest.length ? { merge: { map: [source, reference(rest)] } } : { merge: source }
   }
 
   /** Fold a list of `[operator, operand]` pairs left-associatively. */
