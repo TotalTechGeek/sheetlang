@@ -1,0 +1,15 @@
+{
+  "name": "formulas-comparison",
+  "private": true,
+  "type": "module",
+  "description": "Head-to-head benchmarks against HyperFormula. Isolated so that HyperFormula's GPL-3.0-only licence never reaches the parent package.",
+  "scripts": {
+    "check": "node agreement.js && node extended.js",
+    "agreement": "node agreement.js",
+    "extended": "node extended.js",
+    "bench": "node head-to-head.js"
+  },
+  "dependencies": {
+    "hyperformula": "^3.3.0"
+  }
+}
